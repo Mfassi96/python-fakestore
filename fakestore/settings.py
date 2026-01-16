@@ -55,7 +55,7 @@ ROOT_URLCONF = 'fakestore.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'fakestore' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
