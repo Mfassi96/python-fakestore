@@ -15,7 +15,7 @@
                 <p class="card-text">{{ product.description }}</p>
                 <div class="mt-auto">
                     <p class="card-text">{{ product.price }}</p>
-                    <a href="#" class="btn btn-primary">Agregar al carrito
+                    <a href="{%url 'add_to_cart' product.id %}" class="btn btn-primary">Agregar al carrito
                         <i class="fa-solid fa-cart-plus"></i>
                     </a>
                 </div>
