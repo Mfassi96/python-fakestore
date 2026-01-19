@@ -1,5 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from . forms import CustomUserCreationForm
+from django.contrib.auth import login,logout
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
 import requests
+
 
 
 # Create your views here.
@@ -62,3 +67,33 @@ def remove_from_cart(request, product_id):
         del cart[str(product_id)]
         request.session['cart'] = cart
     return redirect('view_cart')
+
+
+
+def formulario_registro(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('get_products')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'store/register.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                 login(request, user)
+                 messages.info(request, f"Has iniciado sesión como {username}.")
+                 return redirect('get_products')
+            else:
+                messages.error(request, "Nombre de usuario o contraseña incorrectos.")
+    else:
+        form = AuthenticationForm()
+        return render(request, 'store/login.html', {'form': form})
