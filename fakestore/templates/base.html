@@ -41,7 +41,7 @@
 
       <!-- Enlaces del Menú -->
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-center">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="/">
               <i class="fa-solid fa-box-open me-1"></i> Productos
@@ -57,6 +57,21 @@
               <i class="fa-solid fa-paper-plane me-1"></i> Contacto
             </a>
           </li>
+
+          <!-- Auth Section -->
+          {% if user.is_authenticated %}
+          <li class="nav-item text-light me-3">
+            <span>Hola, {{ user.username }}</span>
+          </li>
+          <li class="nav-item">
+            <form action="{% url 'logout' %}" method="POST" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                Salir <i class="fa-solid fa-arrow-right-from-bracket ms-1"></i>
+              </button>
+            </form>
+          </li>
+          {% else %}
           <li class="nav-item ms-lg-3">
             <a class="btn btn-primary text-white px-4" href="{% url 'login' %}">
               <i class="fa-solid fa-user me-1"></i> Iniciar Sesión
@@ -67,6 +82,7 @@
               <i class="fa-solid fa-user me-1"></i> Registrarse
             </a>
           </li>
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -80,17 +96,14 @@
   </main>
 
   <!-- Footer Simple -->
-  <footer>
-    FakeStore &copy; 2026
-    <script>
-      document.write(new Date().getFullYear());
-    </script>
+  <footer class="text-center py-4 mt-5 border-top text-muted">
+    <small>FakeStore &copy; {% now "Y" %}. Todos los derechos reservados.</small>
   </footer>
 
-    <!-- Bootstrap Bundle with Popper (IMPORTANTE: Debe estar aquí para que funcione la hamburguesa) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-      xintegrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-      crossorigin="anonymous"></script>
+  <!-- Bootstrap Bundle with Popper (IMPORTANTE: Debe estar aquí para que funcione la hamburguesa) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    xintegrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
 </body>
 
 </html>

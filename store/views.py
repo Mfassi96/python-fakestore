@@ -1,24 +1,67 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from . forms import CustomUserCreationForm
-from django.contrib.auth import login,logout
-from django.contrib import messages
+from django.contrib.auth import login, logout, authenticate  # <--- SE AGREGÓ 'authenticate' AQUÍ
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
+from .forms import CustomUserCreationForm
 import requests
 
+# --- Vistas de Autenticación ---
 
+def formulario_registro(request):
+    """Maneja el registro de nuevos usuarios."""
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "¡Registro exitoso! Bienvenido a la tienda.")
+            return redirect('get_products')
+        else:
+            messages.error(request, "Hubo un error en el registro. Por favor, revisa los datos.")
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'store/register.html', {'form': form})
 
-# Create your views here.
+def login_view(request):
+    """Maneja el inicio de sesión."""
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            # 'authenticate' verifica que el usuario y contraseña coincidan
+            user = authenticate(username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                messages.info(request, f"Has iniciado sesión como {username}.")
+                return redirect('get_products')
+            else:
+                messages.error(request, "Nombre de usuario o contraseña incorrectos.")
+        else:
+            messages.error(request, "Datos de formulario inválidos.")
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'store/login.html', {'form': form})
+
+def logout_view(request):
+    """Cierra la sesión del usuario."""
+    logout(request)
+    messages.info(request, "Has cerrado sesión correctamente.")
+    return redirect('get_products')
+
+# --- Vistas de la Tienda ---
 
 def get_products(request):
+    """Lista de productos desde la API."""
     response = requests.get('https://fakestoreapi.com/products/')
     products = response.json()
     return render(request, 'store/products.html', {'products': products})
 
 def view_cart(request):
-    
+    """Visualización del carrito de compras."""
     cart = request.session.get('cart', {})
-    
-    #logica del carrito
     cart_items = []
     total = 0
     
@@ -40,17 +83,17 @@ def view_cart(request):
     })
 
 def add_to_cart(request, product_id):
-    """Agrega un producto al carrito en la sesión."""
-    # Obtenemos el producto de la API 
+    """Añade un producto al carrito en la sesión."""
     response = requests.get(f'https://fakestoreapi.com/products/{product_id}')
     product = response.json()
     
     cart = request.session.get('cart', {})
+    p_id = str(product_id)
     
-    if str(product_id) in cart:
-        cart[str(product_id)]['quantity'] += 1
+    if p_id in cart:
+        cart[p_id]['quantity'] += 1
     else:
-        cart[str(product_id)] = {
+        cart[p_id] = {
             'title': product['title'],
             'price': product['price'],
             'image': product['image'],
@@ -58,42 +101,15 @@ def add_to_cart(request, product_id):
         }
     
     request.session['cart'] = cart
+    request.session.modified = True 
     return redirect('view_cart')
 
 def remove_from_cart(request, product_id):
-    """Elimina un producto del carrito."""
+    """Quita un producto del carrito."""
     cart = request.session.get('cart', {})
-    if str(product_id) in cart:
-        del cart[str(product_id)]
+    p_id = str(product_id)
+    if p_id in cart:
+        del cart[p_id]
         request.session['cart'] = cart
+        request.session.modified = True
     return redirect('view_cart')
-
-
-
-def formulario_registro(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('get_products')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'store/register.html', {'form': form})
-
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                 login(request, user)
-                 messages.info(request, f"Has iniciado sesión como {username}.")
-                 return redirect('get_products')
-            else:
-                messages.error(request, "Nombre de usuario o contraseña incorrectos.")
-    else:
-        form = AuthenticationForm()
-        return render(request, 'store/login.html', {'form': form})
