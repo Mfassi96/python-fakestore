@@ -69,9 +69,8 @@
                     <span class="h5 fw-bold">Total</span>
                     <span class="h5 fw-bold text-primary">${{ total|stringformat:".2f" }}</span>
                 </div>
-                <button class="btn btn-primary w-100 py-3 fw-bold">
-                    Finalizar Compra
-                </button>
+                    <a href="{% url 'shipping' %}" class="btn btn-primary w-100 py-3 fw-bold">Finalizar Compra</a>
+
             </div>
         </div>
     </div>

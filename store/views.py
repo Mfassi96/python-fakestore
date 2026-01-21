@@ -3,7 +3,10 @@ from django.contrib.auth import login, logout, authenticate  # <--- SE AGREGÓ '
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from .forms import CustomUserCreationForm
+from django.contrib.auth.decorators import login_required
 import requests
+from .forms import ShippingForm
+from .models import Order
 
 # --- Vistas de Autenticación ---
 
@@ -113,3 +116,46 @@ def remove_from_cart(request, product_id):
         request.session['cart'] = cart
         request.session.modified = True
     return redirect('view_cart')
+
+@login_required
+def shipping_view(request):
+    cart = request.session.get('cart', {})
+    if not cart:
+        messages.warning(request, "Tu carrito está vacío.")
+        return redirect('get_products')
+    # Calculamos el total para mostrarlo en el resumen lateral
+    total = sum(float(item['price']) * item['quantity'] for item in cart.values())
+    cart_count = sum(item['quantity'] for item in cart.values())
+
+    if request.method == 'POST':
+        form = ShippingForm(request.POST)
+        if form.is_valid():
+            # Aquí procesarías el pedido (guardar en BD, enviar email, etc.)
+            # Por ahora, vaciamos el carrito y confirmamos
+            '''
+            request.session['cart'] = {}
+            messages.success(request, "¡Información de envío recibida! Tu pedido está en camino.")
+            return redirect('get_products')'''
+            order = Order.objects.create(
+                user=request.user,
+                full_name=form.cleaned_data['full_name'],
+                address=form.cleaned_data['address'],
+                city=form.cleaned_data['city'],
+                postal_code=form.cleaned_data['postal_code'],
+                phone=form.cleaned_data['phone'],
+                items=list(cart.values()),
+                total=total,
+            )
+            request.session['cart'] = {}
+            messages.success(request, "¡Información de envío recibida! Tu pedido está en camino.")
+            return redirect('get_products')
+    else:
+        form = ShippingForm()
+
+    return render(request, 'store/checkout.html', {
+        'form': form,
+        'total': total,
+        'cart_count': cart_count
+    })
+
+    
