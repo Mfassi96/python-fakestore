@@ -1,0 +1,23 @@
+{
+  "name": "fake_store",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mfassi96/python-fakestore.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mfassi96/python-fakestore/issues"
+  },
+  "homepage": "https://github.com/Mfassi96/python-fakestore#readme",
+  "dependencies": {
+    "sweetalert2": "^11.26.17"
+  }
+}

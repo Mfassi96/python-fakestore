@@ -123,19 +123,14 @@ def shipping_view(request):
     if not cart:
         messages.warning(request, "Tu carrito está vacío.")
         return redirect('get_products')
-    # Calculamos el total para mostrarlo en el resumen lateral
+    
     total = sum(float(item['price']) * item['quantity'] for item in cart.values())
     cart_count = sum(item['quantity'] for item in cart.values())
 
     if request.method == 'POST':
         form = ShippingForm(request.POST)
         if form.is_valid():
-            # Aquí procesarías el pedido (guardar en BD, enviar email, etc.)
-            # Por ahora, vaciamos el carrito y confirmamos
-            '''
-            request.session['cart'] = {}
-            messages.success(request, "¡Información de envío recibida! Tu pedido está en camino.")
-            return redirect('get_products')'''
+            # 1. Guardamos la orden en la DB
             order = Order.objects.create(
                 user=request.user,
                 full_name=form.cleaned_data['full_name'],
@@ -146,8 +141,14 @@ def shipping_view(request):
                 items=list(cart.values()),
                 total=total,
             )
+            
+            # 2. Vaciamos el carrito y marcamos sesión como modificada
             request.session['cart'] = {}
-            messages.success(request, "¡Información de envío recibida! Tu pedido está en camino.")
+            request.session.modified = True
+            
+            # 3. CREAMOS EL MENSAJE AQUÍ (se mostrará tras el redirect)
+            messages.success(request, f"¡Pedido #{order.id} recibido con éxito! Gracias por tu compra.")
+            
             return redirect('get_products')
     else:
         form = ShippingForm()
@@ -157,5 +158,3 @@ def shipping_view(request):
         'total': total,
         'cart_count': cart_count
     })
-
-    
