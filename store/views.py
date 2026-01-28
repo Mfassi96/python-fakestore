@@ -167,13 +167,14 @@ def contact_view(request):
         messages.error(request, "Debes iniciar sesión para contactarnos.")
         return redirect('login')
     if request.method == 'POST':
-        form = ContactForm(request.POST)
+        form = ContactForm(request.POST,request.FILES)
         if form.is_valid():
             # Guardamos el mensaje en la DB
             Contact.objects.create(
                 name=form.cleaned_data['name'],
                 email=form.cleaned_data['email'],
-                message=form.cleaned_data['message']
+                message=form.cleaned_data['message'],
+                comprobante=form.cleaned_data['comprobante']
             )
             messages.success(request, "¡Mensaje enviado con éxito! Te responderemos pronto.")
             return redirect('get_products')

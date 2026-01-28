@@ -30,6 +30,7 @@ class Contact(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nombre")
     email = models.EmailField(verbose_name="Email")
     message = models.TextField(verbose_name="Mensaje")
+    comprobante = models.ImageField(upload_to='comprobantes/', verbose_name="Comprobante de Pago")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Recepción")
     
     def __str__(self):

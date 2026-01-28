@@ -40,15 +40,19 @@ class ShippingForm(forms.Form):
 
 class ContactForm(forms.Form):
     name = forms.CharField(
-        label="Nombre",
+        label="Nombre (*)",
         max_length=100,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Juan Pérez'})
     )
     email = forms.EmailField(
-        label="Email",
+        label="Email (*)",
         widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ej. correo@correo.com'})
     )
     message = forms.CharField(
-        label="Mensaje",
+        label="Mensaje (*)",
         widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Escribe tu mensaje aquí...'})
+    )
+    comprobante = forms.FileField(
+        label="Comprobante de Pago (*)",
+        widget=forms.FileInput(attrs={'class': 'form-control'})
     )

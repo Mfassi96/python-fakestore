@@ -15,6 +15,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+TELEFONO_CONTACTO = os.getenv('TELEFONO_CONTACTO')
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
@@ -68,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'store.context_processors.global_settings',
             ],
         },
     },
@@ -123,3 +125,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 AUTH_USER_MODEL = 'store.User'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
