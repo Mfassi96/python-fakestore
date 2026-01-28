@@ -26,3 +26,11 @@ class Order(models.Model):
     def __str__(self):
         return f"Pedido {self.id} - {self.full_name}"
 
+class Contact(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Nombre")
+    email = models.EmailField(verbose_name="Email")
+    message = models.TextField(verbose_name="Mensaje")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Recepción")
+    
+    def __str__(self):
+        return f"Consulta de {self.name} - {self.created_at.strftime('%d/%m/%Y')}"

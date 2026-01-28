@@ -5,8 +5,8 @@ from django.contrib import messages
 from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
 import requests
-from .forms import ShippingForm
-from .models import Order
+from .forms import ShippingForm,ContactForm
+from .models import Order, Contact
 
 # --- Vistas de Autenticación ---
 
@@ -64,6 +64,9 @@ def get_products(request):
 
 def view_cart(request):
     """Visualización del carrito de compras."""
+    if not request.user.is_authenticated:
+        messages.error(request, "Debes iniciar sesión para ver tu carrito.")
+        return redirect('login')
     cart = request.session.get('cart', {})
     cart_items = []
     total = 0
@@ -158,3 +161,22 @@ def shipping_view(request):
         'total': total,
         'cart_count': cart_count
     })
+
+def contact_view(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "Debes iniciar sesión para contactarnos.")
+        return redirect('login')
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Guardamos el mensaje en la DB
+            Contact.objects.create(
+                name=form.cleaned_data['name'],
+                email=form.cleaned_data['email'],
+                message=form.cleaned_data['message']
+            )
+            messages.success(request, "¡Mensaje enviado con éxito! Te responderemos pronto.")
+            return redirect('get_products')
+    else:
+        form = ContactForm()
+    return render(request, 'store/contact.html', {'form': form})
